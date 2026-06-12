@@ -14,3 +14,6 @@ class ResponseSchema(BaseModel):
     id:int
 
 
+class LoginSchema(BaseModel):
+    username:str
+    password:str
