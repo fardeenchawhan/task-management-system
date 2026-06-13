@@ -66,10 +66,6 @@ def is_authenticated(request:Request,db:Session):
         exp_time=int(data.get("exp"))
 
 
-    
-
-    
-    
         is_user=db.query(Usermodel).filter(Usermodel.id==user_id).first()
         if not is_user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="You are unauthorized")
