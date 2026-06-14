@@ -6,5 +6,8 @@ class Settings(BaseSettings):
     SECRET_KEY:str
     ALGORITHM:str
     EXPIRY_TIME:int
+    MAIL_USERNAME:str
+    MAIL_PASSWORD:str
+    MAIL_FROM:str
 
 settings=Settings()

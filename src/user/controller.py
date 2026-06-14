@@ -7,6 +7,7 @@ import jwt
 from src.utils.settings import settings
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime,timedelta
+from src.utils.mail import send_email
 
 password_hash=PasswordHash.recommended()
 
@@ -16,7 +17,7 @@ def get_password_hash(password):
 def verify_password(plain_password,hash_password):
     return password_hash.verify(plain_password,hash_password)
 
-def register(body:UserSchema,db:Session):
+async def register(body:UserSchema,db:Session):
     is_user=db.query(Usermodel).filter(Usermodel.username==body.username).first()
     if is_user:
         raise HTTPException(400,detail="username already exist...")
@@ -37,6 +38,8 @@ def register(body:UserSchema,db:Session):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    res=await send_email([new_user.email])
     
     return new_user
 
@@ -54,26 +57,26 @@ def login_user(body:Usermodel,db:Session):
     return {"token":token}
 
 
-def is_authenticated(request:Request,db:Session):
-    try:
-        token=request.headers.get("authorization")
-        if not token:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="You are unauthorized")
+# def is_authenticated(request:Request,db:Session):
+#     try:
+#         token=request.headers.get("authorization")
+#         if not token:
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="You are unauthorized")
         
-        token=token.split(" ")[-1]
-        data=jwt.decode(token,settings.SECRET_KEY,settings.ALGORITHM)
-        user_id=data.get("id")
-        exp_time=int(data.get("exp"))
+#         token=token.split(" ")[-1]
+#         data=jwt.decode(token,settings.SECRET_KEY,settings.ALGORITHM)
+#         user_id=data.get("id")
+#         exp_time=int(data.get("exp"))
 
 
-        is_user=db.query(Usermodel).filter(Usermodel.id==user_id).first()
-        if not is_user:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="You are unauthorized")
+#         is_user=db.query(Usermodel).filter(Usermodel.id==user_id).first()
+#         if not is_user:
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="You are unauthorized")
 
-        return is_user
+#         return is_user
     
-    except InvalidTokenError:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="You are unauthorized")
+#     except InvalidTokenError:
+#             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="You are unauthorized")
 
 
 
