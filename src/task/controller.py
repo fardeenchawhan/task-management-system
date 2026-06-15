@@ -1,5 +1,6 @@
 from src.task.ditos import TaskSchema ,TaskUpdateSchema
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session 
+from sqlalchemy import or_
 from src.task.models import Taskmodel
 from fastapi import HTTPException
 from src.user.models import Usermodel
@@ -15,10 +16,36 @@ def create_task(body:TaskSchema, db:Session,user:Usermodel):
     return new_task
 
 
-def get_all_tasks(db:Session,user:Usermodel):
-    tasks=db.query(Taskmodel).filter(user.id==Taskmodel.user_id).all()
-    return tasks
+def get_all_tasks(db:Session,user:Usermodel,page:int,limit:int):
+    
+    skip = (page - 1) * limit
 
+    tasks = (
+        db.query(Taskmodel)
+        .filter(Taskmodel.user_id==user.id)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    return tasks
+    
+def search_tasks(user:Usermodel,query:str,db:Session):
+    tasks = (
+        db.query(Taskmodel)
+        .filter(Taskmodel.user_id==user.id)
+        .filter(
+            or_(
+                Taskmodel.title.ilike(f"%{query}%"),
+                Taskmodel.description.ilike(f"%{query}%")
+            )
+        )
+        .all()
+    )
+    if not tasks:
+        raise HTTPException(status_code=404, detail="task not found")
+       
+
+    return tasks
 def get_one_task(task_id:int, db:Session,user:Usermodel):
     
     one_task=db.query(Taskmodel).get(task_id)

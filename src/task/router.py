@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException,Depends, status
+from fastapi import APIRouter, HTTPException,Depends, status,Query
 from src.task import controller
 from src.task.ditos import TaskSchema,TaskUpdateSchema,TaskResponseSchema
 from src.utils.db import get_db
-from typing import List
+from typing import List,Dict
 from sqlalchemy.orm import Session
 from src.utils.helpers import is_authenticated
 from src.user.models import Usermodel
@@ -17,12 +17,21 @@ def create_task(body:TaskSchema,db:Session=Depends(get_db),user:Usermodel=Depend
     return controller.create_task(body,db,user)
 
 @task_routes.get("/all_tasks",response_model=List[TaskResponseSchema],status_code=status.HTTP_200_OK)
-def get_all_tasks(db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated)):
-    return controller.get_all_tasks(db,user)
+def get_all_tasks(db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated),page:int=Query(1,ge=1),limit:int=Query(10,ge=1,le=100)):
+    return controller.get_all_tasks(db,user,page,limit)
+
+@task_routes.get("/search_task",response_model=List[TaskResponseSchema],status_code=status.HTTP_200_OK)
+def search_tasks(
+    query: str = Query(..., min_length=1),
+    db: Session = Depends(get_db),
+    user:Usermodel=Depends(is_authenticated)   
+):
+    return controller.search_tasks(user,query,db)
 
 @task_routes.get("/{task_id}",response_model=TaskResponseSchema,status_code=status.HTTP_200_OK)
 def get_one_task(task_id:int,db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated)):
     return controller.get_one_task(task_id,db,user)
+
 
 @task_routes.put("/update/{task_id}",response_model=TaskResponseSchema,status_code=status.HTTP_201_CREATED)
 def update_task(body:TaskUpdateSchema,task_id:int,db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated)):
