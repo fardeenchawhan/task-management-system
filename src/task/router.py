@@ -6,6 +6,7 @@ from typing import List,Dict
 from sqlalchemy.orm import Session
 from src.utils.helpers import is_authenticated
 from src.user.models import Usermodel
+from datetime import date, timedelta
 
 
 
@@ -28,6 +29,37 @@ def search_tasks(
 ):
     return controller.search_tasks(user,query,db)
 
+
+@task_routes.get("/due-tomorrow",response_model=List[TaskResponseSchema],status_code=status.HTTP_200_OK)
+def due_tomorrow(db: Session = Depends(get_db),user:Usermodel=Depends(is_authenticated)):
+    return controller.due_tomorrow(db,user)
+
+
+@task_routes.post("/task-reminder/{task_id}")
+async def task_reminder(
+    task_id: int,
+    user:Usermodel=Depends(is_authenticated),
+    db: Session = Depends(get_db)
+):
+    return await controller.task_reminder(task_id,user,db)
+
+@task_routes.get("/priority/{priority}",response_model=List[TaskResponseSchema],status_code=status.HTTP_200_OK)
+def get_tasks_by_priority(
+    priority: str,
+    db: Session = Depends(get_db),
+    user:Usermodel=Depends(is_authenticated),
+):
+    return controller.get_priority(priority,db,user)
+
+@task_routes.get("/status/{status}",response_model=List[TaskResponseSchema],status_code=status.HTTP_200_OK)
+def get_tasks_by_status(
+    status: str,
+    db: Session = Depends(get_db),
+    user:Usermodel=Depends(is_authenticated),
+):
+    return controller.get_status(status,db,user)
+
+
 @task_routes.get("/{task_id}",response_model=TaskResponseSchema,status_code=status.HTTP_200_OK)
 def get_one_task(task_id:int,db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated)):
     return controller.get_one_task(task_id,db,user)
@@ -40,3 +72,6 @@ def update_task(body:TaskUpdateSchema,task_id:int,db:Session=Depends(get_db),use
 @task_routes.delete("/delete/{task_id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id:int,db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated)):
     return controller.delete_task(task_id,db,user)
+
+
+

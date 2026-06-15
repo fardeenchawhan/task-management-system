@@ -4,15 +4,17 @@ from sqlalchemy import or_
 from src.task.models import Taskmodel
 from fastapi import HTTPException
 from src.user.models import Usermodel
+from datetime import date, timedelta
+from src.utils.mail import send_task_reminder
 
 def create_task(body:TaskSchema, db:Session,user:Usermodel):
     data=body.model_dump()
-    new_task=Taskmodel(title=data['title'],description=data['description'],is_completed=data['is_completed'],user_id=user.id)
+    new_task=Taskmodel(title=data['title'],description=data['description'],status=data['status'],priority=data['priority'],due_date=data['due_date'],user_id=user.id)
     db.add(new_task)
     db.commit()
     db.refresh(new_task)
 
-
+    
     return new_task
 
 
@@ -44,8 +46,35 @@ def search_tasks(user:Usermodel,query:str,db:Session):
     if not tasks:
         raise HTTPException(status_code=404, detail="task not found")
        
-
     return tasks
+
+
+def get_status(status:int,db:Session,user:Usermodel):
+   tasks=(
+        db.query(Taskmodel)
+        .filter(Taskmodel.user_id==user.id)
+        .filter(Taskmodel.status == status)
+        .all()
+    )
+   if not tasks:
+        raise HTTPException(status_code=404, detail="task not found")
+   
+   return tasks
+
+
+def get_priority(priority:int,db:Session,user:Usermodel):
+   tasks=(
+        db.query(Taskmodel)
+        .filter(Taskmodel.user_id==user.id)
+        .filter(Taskmodel.priority == priority)
+        .all()
+    )
+   if not tasks:
+        raise HTTPException(status_code=404, detail="task not found")
+   
+   return tasks
+
+
 def get_one_task(task_id:int, db:Session,user:Usermodel):
     
     one_task=db.query(Taskmodel).get(task_id)
@@ -67,7 +96,6 @@ def update_task(body:TaskUpdateSchema,db:Session,task_id:int,user:Usermodel):
     new_body=body.model_dump(exclude_unset=True)
     for field, value in new_body.items():
        setattr(one_task,field,value)
-
     db.add(one_task)
     db.commit()
     db.refresh(one_task)
@@ -88,6 +116,48 @@ def delete_task(task_id:int,db:Session,user:Usermodel):
 
     return None
 
+
+def due_tomorrow(db:Session,user:Usermodel):
+    tomorrow = date.today() + timedelta(days=1)
+
+    tasks = (
+        db.query(Taskmodel)
+        .filter(Taskmodel.user_id==user.id)
+        .filter(
+            Taskmodel.due_date == tomorrow,
+            Taskmodel.status != "completed"
+        )
+        .all()
+    )
+    if not tasks:
+      raise HTTPException(status_code=404, detail="There is no task with the Due Date of Tomorrow")
+
+    return tasks
+
+
+async def task_reminder(task_id:int,user:Usermodel,db:Session):
+   task = (
+        db.query(Taskmodel)
+        .filter(
+            Taskmodel.id == task_id,
+            Taskmodel.user_id == user.id
+        )
+        .first()
+    )
+
+   if not task:
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found"
+        )
+
+   await send_task_reminder(
+        email=user.email,
+        task_title=task.title,
+        due_date=str(task.due_date)
+    )
+
+   return {"message": "Reminder sent"}
    
 
 

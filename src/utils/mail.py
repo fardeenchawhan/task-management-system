@@ -22,15 +22,59 @@ conf = ConnectionConfig(
 
 
 
-async def send_email(emails: List[str]):
-    html = """<p>Hi thanks for registeration our team will connect with you soon</p> """
 
+async def send_email(
+    emails: List[str],
+    subject: str,
+    body: str
+):
     message = MessageSchema(
-        subject="Registeration Confirmation",
+        subject=subject,
         recipients=emails,
-        body=html,
-        subtype=MessageType.html)
+        body=body,
+        subtype=MessageType.html
+    )
 
     fm = FastMail(conf)
     await fm.send_message(message)
-    return {"message":"mail has been sent"}
+
+    return {"message": "mail has been sent"}
+
+
+
+async def send_task_reminder(
+    email: str,
+    task_title: str,
+    due_date: str
+):
+    body = f"""
+    <h2>Task Reminder</h2>
+
+    <p>Your task
+    <strong>{task_title}</strong>
+    is due on
+    <strong>{due_date}</strong>.</p>
+
+    <p>Please complete it before the deadline.</p>
+    """
+
+    await send_email(
+        emails=[email],
+        subject="Task Due Reminder",
+        body=body
+    )
+
+# async def send_email(emails: List[str]):
+#     html = """<p>Hi thanks for registeration our team will connect with you soon</p> """
+
+#     message = MessageSchema(
+#         subject="Registeration Confirmation",
+#         recipients=emails,
+#         body=html,
+#         subtype=MessageType.html)
+
+#     fm = FastMail(conf)
+#     await fm.send_message(message)
+#     return {"message":"mail has been sent"}
+
+

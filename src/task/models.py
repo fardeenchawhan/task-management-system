@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,Boolean,ForeignKey
+from sqlalchemy import Column,Integer,String,Boolean,ForeignKey,Date
 from src.utils.db import Base
 
 class Taskmodel(Base):
@@ -7,6 +7,8 @@ class Taskmodel(Base):
     id=Column(Integer, primary_key=True)
     title=Column(String)
     description=Column(String)
-    is_completed=Column(Boolean, default=False)
+    status=Column(String, default="pending")
+    priority=Column(String)
+    due_date=Column(Date,nullable=True)
 
     user_id=Column(Integer,ForeignKey("user_table.id",ondelete="CASCADE"))

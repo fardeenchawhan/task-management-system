@@ -39,7 +39,14 @@ async def register(body:UserSchema,db:Session):
     db.commit()
     db.refresh(new_user)
 
-    res=await send_email([new_user.email])
+    res=await send_email(
+      emails=[new_user.email],
+      subject="Registration Confirmation",
+      body="""
+        <h2>Welcome</h2>
+        <p>Thanks for registering.</p>
+        """
+    )
     
     return new_user
 
