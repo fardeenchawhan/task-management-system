@@ -87,6 +87,7 @@ def get_one_task(task_id:int, db:Session,user:Usermodel):
 
 def update_task(body:TaskUpdateSchema,db:Session,task_id:int,user:Usermodel):
     one_task=db.query(Taskmodel).get(task_id)
+    old_due_date=one_task.due_date
     if not one_task:
       raise HTTPException(status_code=404, detail="task not found")
     
@@ -96,6 +97,9 @@ def update_task(body:TaskUpdateSchema,db:Session,task_id:int,user:Usermodel):
     new_body=body.model_dump(exclude_unset=True)
     for field, value in new_body.items():
        setattr(one_task,field,value)
+
+    if one_task.due_date != old_due_date:
+       one_task.reminder_sent = False
     db.add(one_task)
     db.commit()
     db.refresh(one_task)
@@ -135,29 +139,23 @@ def due_tomorrow(db:Session,user:Usermodel):
     return tasks
 
 
-async def task_reminder(task_id:int,user:Usermodel,db:Session):
-   task = (
-        db.query(Taskmodel)
-        .filter(
-            Taskmodel.id == task_id,
-            Taskmodel.user_id == user.id
-        )
-        .first()
-    )
+def task_overdue(db:Session,user:Usermodel):
+   day:date=date.today()
+   tasks=(
+      db.query(Taskmodel)
+      .filter(
+         Taskmodel.user_id==user.id,
+         Taskmodel.due_date.is_not(None),
+         Taskmodel.due_date<day,
+         Taskmodel.status != "completed"
+         )
+      .all())
+   
+   if not tasks:
+      raise HTTPException(status_code=404, detail="There is no overdue date task")
+   return tasks
+      
 
-   if not task:
-        raise HTTPException(
-            status_code=404,
-            detail="Task not found"
-        )
-
-   await send_task_reminder(
-        email=user.email,
-        task_title=task.title,
-        due_date=str(task.due_date)
-    )
-
-   return {"message": "Reminder sent"}
    
 
 
