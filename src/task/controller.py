@@ -79,17 +79,17 @@ def get_one_task(task_id:int, db:Session,user:Usermodel):
     
     one_task=db.query(Taskmodel).get(task_id)
     if not one_task:
-      raise HTTPException(status_code=404, detail="task not found")
+      raise HTTPException(status_code=404, detail="Task not found")
     
     if one_task.user_id != user.id:
-      raise HTTPException(status_code=401, detail="You don't have access to task")
+      raise HTTPException(status_code=401, detail="You don't have access to this task")
     return one_task
 
 def update_task(body:TaskUpdateSchema,db:Session,task_id:int,user:Usermodel):
     one_task=db.query(Taskmodel).get(task_id)
     old_due_date=one_task.due_date
     if not one_task:
-      raise HTTPException(status_code=404, detail="task not found")
+      raise HTTPException(status_code=404, detail="Task not found")
     
     if one_task.user_id != user.id:
       raise HTTPException(status_code=401, detail="You cannot update this task")
@@ -110,7 +110,7 @@ def update_task(body:TaskUpdateSchema,db:Session,task_id:int,user:Usermodel):
 def delete_task(task_id:int,db:Session,user:Usermodel):
     one_task=db.query(Taskmodel).get(task_id)
     if not one_task:
-      raise HTTPException(status_code=404, detail="task not found")
+      raise HTTPException(status_code=404, detail="Task not found")
     if one_task.user_id != user.id:
       raise HTTPException(status_code=401, detail="You cannot delete this task")
        
