@@ -7,8 +7,8 @@ class Usermodel(Base):
 
     id=Column(Integer,primary_key=True)
     name=Column(String)
-    username=Column(String,nullable=False)
-    email=Column(String)
+    username=Column(String,unique=True,nullable=False)
+    email=Column(String,unique=True)
     hash_password=Column(String,nullable=False)
 
     tasks = relationship(

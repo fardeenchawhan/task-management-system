@@ -1,4 +1,4 @@
-from src.user.ditos import UserSchema
+from src.user.ditos import UserSchema,ProfilUpdateSchema
 from sqlalchemy.orm import Session
 from src.user.models import Usermodel
 from fastapi import HTTPException,status,Request
@@ -62,6 +62,72 @@ def login_user(body:Usermodel,db:Session):
     token=jwt.encode({"id":user.id,"exp":exp_time.timestamp()},settings.SECRET_KEY,settings.ALGORITHM)
 
     return {"token":token}
+
+
+def get_profil(db:Session,user:Usermodel):
+    return user
+
+
+def update_profil(body:ProfilUpdateSchema,db:Session,user:Usermodel):
+
+    if body.email:
+        existing_email=(
+            db.query(Usermodel)
+            .filter(
+                Usermodel.email==body.email,
+                Usermodel.id != user.id
+            ).first()
+        )
+        
+        if existing_email:
+            raise HTTPException(
+                    status_code=400,
+                    detail="Email already exists"
+            )
+            
+    if body.username:
+        existing_username=(
+            db.query(Usermodel)
+            .filter(
+                Usermodel.username==body.username,
+                Usermodel.id != user.id   
+            ).first()
+        )
+
+        if existing_username:
+            raise HTTPException(
+                    status_code=400,
+                    detail="username already exists"
+            )
+    up_profil=body.model_dump(exclude_unset=True)
+    for key ,value in up_profil.items():
+        setattr(user,key,value)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
+def ChangePassword(body,db,user):
+    if not verify_password(body.old_password,user.hash_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="You have enter the wrong password")
+    
+    if verify_password(body.new_password,user.hash_password):
+        raise HTTPException(status_code=400,detail="New password must be different")
+    
+    new_password=get_password_hash(body.new_password)
+    user.hash_password=new_password
+
+    db.commit()
+
+
+    return {
+        "message": "Password updated successfully"
+    }
+
+
+
 
 
 # def is_authenticated(request:Request,db:Session):

@@ -15,7 +15,7 @@ from src.scheduler.reminder_scheduler import send_due_reminders
 
 task_routes= APIRouter(prefix="/tasks")
 
-@task_routes.post("/create",response_model=TaskResponseSchema,status_code=status.HTTP_201_CREATED)
+@task_routes.post("",response_model=TaskResponseSchema,status_code=status.HTTP_201_CREATED)
 def create_task(body:TaskSchema,db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated)):
     return controller.create_task(body,db,user)
 
