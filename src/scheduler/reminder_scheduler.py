@@ -44,6 +44,7 @@ async def send_due_reminders():
 
 scheduler.add_job(
     send_due_reminders,
-    trigger="interval",
-    minutes=1
+    trigger="cron",
+    hour=9,
+    minute=0
 )

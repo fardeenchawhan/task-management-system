@@ -34,7 +34,7 @@ def get_all_tasks(db:Session=Depends(get_db),user:Usermodel=Depends(is_authentic
     return controller.get_all_tasks(db,user,page,limit)
 
 @task_routes.get(
-        "/search_task",
+        "/search-task",
         summary="Search tasks",
         description="Searches tasks by title or description for the authenticated user.",
         response_model=List[TaskResponseSchema],
