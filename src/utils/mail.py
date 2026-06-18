@@ -64,6 +64,7 @@ async def send_task_reminder(
         body=body
     )
 
+
 # async def send_email(emails: List[str]):
 #     html = """<p>Hi thanks for registeration our team will connect with you soon</p> """
 

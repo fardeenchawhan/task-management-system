@@ -38,7 +38,7 @@ async def register(body:UserSchema,db:Session):
     db.commit()
     db.refresh(new_user)
 
-    res=await send_email(
+    await send_email(
       emails=[new_user.email],
       subject="Registration Confirmation",
       body="""
@@ -67,8 +67,8 @@ def get_profil(db:Session,user:Usermodel):
     return user
 
 
-def update_profil(body:ProfilUpdateSchema,db:Session,user:Usermodel):
-
+async def update_profil(body:ProfilUpdateSchema,db:Session,user:Usermodel):
+    old_email=user.email
     if body.email:
         existing_email=(
             db.query(Usermodel)
@@ -101,9 +101,27 @@ def update_profil(body:ProfilUpdateSchema,db:Session,user:Usermodel):
     up_profil=body.model_dump(exclude_unset=True)
     for key ,value in up_profil.items():
         setattr(user,key,value)
+
     db.add(user)
     db.commit()
     db.refresh(user)
+    if user.email!=old_email:
+        try:
+           await send_email(
+              emails=[user.email],
+              subject="Email Address Updated",
+              body=f"""
+                Your account email address has been updated successfully.
+
+                  Old Email: {old_email}
+                  New Email: {user.email}
+
+                If you did not perform this action, please contact support immediately.
+
+                """
+            )
+        except Exception as e:
+           print("EMAIL ERROR:", str(e))
 
     return user
 

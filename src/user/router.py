@@ -51,8 +51,8 @@ def get_profil(db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticate
         status_code=status.HTTP_200_OK,
         response_model=ResponseSchema
         )
-def update_profil(body:ProfilUpdateSchema,db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated)):
-    return controller.update_profil(body,db,user)
+async def update_profil(body:ProfilUpdateSchema,db:Session=Depends(get_db),user:Usermodel=Depends(is_authenticated)):
+     return await controller.update_profil(body,db,user)
 
 @user_routes.put(
         "/change-password",
