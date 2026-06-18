@@ -3,7 +3,7 @@
 
 ## API Documentation Preview
 
-![Swagger UI](images/swagger-ui.png)
+![Swagger UI](images\swagger-ui.png)
 
 
 ## Overview
