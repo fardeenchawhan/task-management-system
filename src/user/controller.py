@@ -37,16 +37,18 @@ async def register(body:UserSchema,db:Session):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
-    await send_email(
-      emails=[new_user.email],
-      subject="Registration Confirmation",
-      body="""
-        <h2>Welcome</h2>
-        <p>Thanks for registering.</p>
-        """
-    )
-    
+    try:
+      await send_email(
+        emails=[new_user.email],
+        subject="Registration Confirmation",
+        body="""
+          <h2>Welcome</h2>
+          <p>Thanks for registering.</p>
+         """
+     )
+    except Exception as e:
+       print(f"EMAIL ERROR: {e}")
+       
     return new_user
 
 def login_user(body:Usermodel,db:Session):

@@ -11,11 +11,11 @@ conf = ConnectionConfig(
     MAIL_USERNAME = settings.MAIL_USERNAME,
     MAIL_PASSWORD = settings.MAIL_PASSWORD,
     MAIL_FROM = settings.MAIL_FROM,
-    MAIL_PORT = 587,
+    MAIL_PORT = 465,
     MAIL_SERVER = "smtp.gmail.com",
     MAIL_FROM_NAME="from backend",
-    MAIL_STARTTLS = True,
-    MAIL_SSL_TLS = False,
+    MAIL_STARTTLS = False,
+    MAIL_SSL_TLS = True,
     USE_CREDENTIALS = True,
     VALIDATE_CERTS = True
 )
