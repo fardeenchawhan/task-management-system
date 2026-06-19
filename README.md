@@ -1,16 +1,34 @@
 # Task Management System API
 
-
 ## API Documentation Preview
 
 ![Swagger UI](images/Swagger-ui.png)
 
+---
+
+## Live Demo
+
+### Deployed API
+
+https://task-management-system-650m.onrender.com
+
+### Swagger Documentation
+
+https://task-management-system-650m.onrender.com/docs
+
+### ReDoc Documentation
+
+https://task-management-system-650m.onrender.com/redoc
+
+---
 
 ## Overview
 
-Task Management System API is a backend application built with FastAPI that allows users to create, manage, and track tasks efficiently. The system includes secure JWT authentication, task filtering, email notifications, automated reminders, and user profile management.
+Task Management System API is a backend application built with FastAPI that allows users to create, manage, and track tasks efficiently.
 
-The project demonstrates modern backend development practices using FastAPI, SQLAlchemy, PostgreSQL, Alembic, APScheduler, and FastAPI-Mail.
+The system includes secure JWT authentication, task filtering, pagination, email notifications, automated reminders, and user profile management.
+
+This project demonstrates modern backend development practices using FastAPI, SQLAlchemy, PostgreSQL, Alembic, APScheduler, Docker, and FastAPI-Mail.
 
 ---
 
@@ -53,6 +71,8 @@ The project demonstrates modern backend development practices using FastAPI, SQL
 * Health Check Endpoint
 * Interactive Swagger Documentation
 * ReDoc Documentation
+* Docker Support
+* Cloud Deployment
 
 ---
 
@@ -66,7 +86,24 @@ The project demonstrates modern backend development practices using FastAPI, SQL
 * APScheduler
 * FastAPI-Mail
 * Pydantic
+* Docker
 * Python
+
+---
+
+## Technical Highlights
+
+* Built using FastAPI and SQLAlchemy
+* JWT-based Authentication and Authorization
+* PostgreSQL Database Integration
+* Alembic Database Migrations
+* Docker Containerization
+* APScheduler Background Jobs
+* Automated Email Notification System
+* Pagination, Search, and Filtering Support
+* Environment-based Configuration Management
+* Interactive API Documentation using Swagger UI
+* Cloud Deployment using Render
 
 ---
 
@@ -82,31 +119,30 @@ task-management-system/
 │   │   ├── models.py
 │   │   ├── ditos.py
 │   │   └── router.py
-│   │   
 │   │
 │   ├── user/
 │   │   ├── controller.py
 │   │   ├── models.py
 │   │   ├── ditos.py
 │   │   └── router.py
-│   │   
 │   │
 │   ├── scheduler/
 │   │   └── reminder_scheduler.py
-│   │   
 │   │
 │   └── utils/
 │       ├── db.py
 │       ├── helpers.py
 │       ├── settings.py
 │       └── mail.py
-│       
+│
 ├── images/
-│   └── swagger-ui.png
+│   └── Swagger-ui.png
+│
 ├── main.py
 ├── requirements.txt
 ├── README.md
 ├── alembic.ini
+├── Dockerfile
 └── .gitignore
 ```
 
@@ -181,7 +217,7 @@ alembic upgrade head
 ## Run the Application
 
 ```bash
-uvicorn src.main:app --reload
+uvicorn main:app --reload
 ```
 
 Application URL:
@@ -212,8 +248,6 @@ http://127.0.0.1:8000/redoc
 
 ## Build Docker Image
 
-Build the Docker image for the Task Management System:
-
 ```bash
 docker build -t task-management-system .
 ```
@@ -229,7 +263,6 @@ docker run --env-file .env -p 8000:8000 task-management-system
 ```text
 http://localhost:8000/docs
 ```
-
 
 ---
 
@@ -292,13 +325,59 @@ Reminder emails are sent only once per task using the `reminder_sent` flag.
 
 ---
 
+## Deployment
+
+The application is deployed on Render using Docker and PostgreSQL.
+
+### Deployment Stack
+
+* Render Web Service
+* Render PostgreSQL Database
+* Docker
+* FastAPI
+* SQLAlchemy
+
+### Production Notes
+
+Email notifications are implemented using FastAPI-Mail and Gmail SMTP.
+
+Email functionality works correctly in local environments. Cloud deployment may require an email provider such as Resend, SendGrid, or Mailgun due to SMTP restrictions imposed by some hosting providers.
+
+---
+
 ## Future Improvements
 
-- Redis Caching for Frequently Accessed Data
-- Role-Based Access Control (RBAC)
+* Role-Based Access Control (RBAC)
+* Automated Unit Testing
+* Integration Testing
+* GitHub Actions CI/CD Pipeline
+* Redis Caching
+* Production Email Service Integration (Resend/SendGrid)
+* API Rate Limiting
+* WebSocket Notifications
+
+---
+
+## What I Learned
+
+Through this project I gained hands-on experience with:
+
+* REST API Design
+* Authentication and Authorization
+* PostgreSQL Database Design
+* ORM Development with SQLAlchemy
+* Database Migrations using Alembic
+* Docker Containerization
+* Cloud Deployment using Render
+* Background Task Scheduling
+* Email Integration
+* Environment Variable Management
+* API Documentation
+* Software Project Structure
 
 ---
 
 ## Author
 
 **Fardeen Chawhan**
+
