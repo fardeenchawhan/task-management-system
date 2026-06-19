@@ -36,6 +36,22 @@ app= FastAPI(
 app.include_router(task_routes)
 app.include_router(user_routes)
 
+
+@app.get(
+    "/",
+    tags=["System"],
+    summary="API Information",
+    description="Returns basic information about the Task Management System API."
+)
+def root():
+    return {
+        "message": "Task Management System API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "redoc": "/redoc",
+        "health": "/health"
+    }
+
 @app.get(
         "/health",
         tags=["System"],
