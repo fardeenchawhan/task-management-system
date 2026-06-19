@@ -208,6 +208,31 @@ http://127.0.0.1:8000/redoc
 
 ---
 
+# Docker
+
+## Build Docker Image
+
+Build the Docker image for the Task Management System:
+
+```bash
+docker build -t task-management-system .
+```
+
+## Run Docker Container
+
+```bash
+docker run --env-file .env -p 8000:8000 task-management-system
+```
+
+## Access Application
+
+```text
+http://localhost:8000/docs
+```
+
+
+---
+
 ## User Endpoints
 
 | Method | Endpoint              |
