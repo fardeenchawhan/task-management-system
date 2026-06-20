@@ -5,6 +5,16 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    env:
+      DB_CONNECTION: "sqlite:///./test.db"
+      SECRET_KEY: "testsecretkey"
+      ALGORITHM: "HS256"
+      EXPIRY_TIME: "30"
+      MAIL_USERNAME: "test@example.com"
+      MAIL_PASSWORD: "testpassword"
+      MAIL_FROM: "test@example.com"
+
     steps:
       - uses: actions/checkout@v4
 
