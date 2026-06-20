@@ -8,17 +8,9 @@
 
 ## Live Demo
 
-### Deployed API
-
-https://task-management-system-650m.onrender.com
-
-### Swagger Documentation
-
-https://task-management-system-650m.onrender.com/docs
-
-### ReDoc Documentation
-
-https://task-management-system-650m.onrender.com/redoc
+* **API Base URL:** https://task-management-system-650m.onrender.com
+* **Swagger UI:** https://task-management-system-650m.onrender.com/docs
+* **ReDoc:** https://task-management-system-650m.onrender.com/redoc
 
 ---
 
@@ -28,7 +20,7 @@ Task Management System API is a backend application built with FastAPI that allo
 
 The system includes secure JWT authentication, task filtering, pagination, email notifications, automated reminders, and user profile management.
 
-This project demonstrates modern backend development practices using FastAPI, SQLAlchemy, PostgreSQL, Alembic, APScheduler, Docker, and FastAPI-Mail.
+This project demonstrates modern backend development practices using FastAPI, SQLAlchemy, PostgreSQL, Alembic, APScheduler, Docker, automated testing, and CI with GitHub Actions.
 
 ---
 
@@ -73,6 +65,8 @@ This project demonstrates modern backend development practices using FastAPI, SQ
 * ReDoc Documentation
 * Docker Support
 * Cloud Deployment
+* Automated Testing
+* GitHub Actions CI
 
 ---
 
@@ -87,6 +81,8 @@ This project demonstrates modern backend development practices using FastAPI, SQ
 * FastAPI-Mail
 * Pydantic
 * Docker
+* Pytest
+* GitHub Actions
 * Python
 
 ---
@@ -103,6 +99,8 @@ This project demonstrates modern backend development practices using FastAPI, SQ
 * Pagination, Search, and Filtering Support
 * Environment-based Configuration Management
 * Interactive API Documentation using Swagger UI
+* Automated testing with Pytest
+* Continuous Integration using GitHub Actions
 * Cloud Deployment using Render
 
 ---
@@ -112,38 +110,49 @@ This project demonstrates modern backend development practices using FastAPI, SQ
 ```text
 task-management-system/
 │
+├── .github/
+│   └── workflows/
+│       └── test.yml
+│
 ├── alembic/
-├── src/
-│   ├── task/
-│   │   ├── controller.py
-│   │   ├── models.py
-│   │   ├── ditos.py
-│   │   └── router.py
-│   │
-│   ├── user/
-│   │   ├── controller.py
-│   │   ├── models.py
-│   │   ├── ditos.py
-│   │   └── router.py
-│   │
-│   ├── scheduler/
-│   │   └── reminder_scheduler.py
-│   │
-│   └── utils/
-│       ├── db.py
-│       ├── helpers.py
-│       ├── settings.py
-│       └── mail.py
 │
 ├── images/
 │   └── Swagger-ui.png
 │
-├── main.py
-├── requirements.txt
-├── README.md
+├── src/
+│   ├── scheduler/
+│   │   └── reminder_scheduler.py
+│   │
+│   ├── task/
+│   │   ├── controller.py
+│   │   ├── ditos.py
+│   │   ├── models.py
+│   │   └── router.py
+│   │
+│   ├── user/
+│   │   ├── controller.py
+│   │   ├── ditos.py
+│   │   ├── models.py
+│   │   └── router.py
+│   │
+│   └── utils/
+│       ├── db.py
+│       ├── helpers.py
+│       ├── mail.py
+│       └── settings.py
+│
+├── tests/
+│   ├── conftest.py
+│   ├── test_auth.py
+│   └── test_tasks.py
+│
+├── .env
+├── .gitignore
 ├── alembic.ini
 ├── Dockerfile
-└── .gitignore
+├── main.py
+├── README.md
+└── requirements.txt
 ```
 
 ---
@@ -165,13 +174,13 @@ python -m venv venv
 
 ### Activate Virtual Environment
 
-Windows:
+**Windows**
 
 ```bash
 venv\Scripts\activate
 ```
 
-Linux / Mac:
+**Linux / Mac**
 
 ```bash
 source venv/bin/activate
@@ -187,14 +196,12 @@ pip install -r requirements.txt
 
 ## Environment Variables
 
-Create a `.env` file in the project root.
+Create a `.env` file in the project root and add the following:
 
 ```env
 DB_CONNECTION=
-
 SECRET_KEY=
 ALGORITHM=
-
 EXPIRY_TIME=
 
 MAIL_USERNAME=
@@ -230,13 +237,13 @@ http://127.0.0.1:8000
 
 ## API Documentation
 
-Swagger UI:
+### Swagger UI
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-ReDoc:
+### ReDoc
 
 ```text
 http://127.0.0.1:8000/redoc
@@ -244,21 +251,21 @@ http://127.0.0.1:8000/redoc
 
 ---
 
-# Docker
+## Docker
 
-## Build Docker Image
+### Build Docker Image
 
 ```bash
 docker build -t task-management-system .
 ```
 
-## Run Docker Container
+### Run Docker Container
 
 ```bash
 docker run --env-file .env -p 8000:8000 task-management-system
 ```
 
-## Access Application
+### Access Application
 
 ```text
 http://localhost:8000/docs
@@ -266,48 +273,68 @@ http://localhost:8000/docs
 
 ---
 
+## Running Tests
+
+The project includes automated tests for authentication and task management flows.
+
+### Run tests locally
+
+```bash
+pytest
+```
+
+---
+
+## Continuous Integration
+
+GitHub Actions is configured to automatically run the test suite on every push and pull request.
+
+This helps ensure that changes do not break existing functionality and keeps the project stable over time.
+
+---
+
 ## User Endpoints
 
-| Method | Endpoint              |
-| ------ | --------------------- |
-| POST   | /user/register        |
-| POST   | /user/login           |
-| GET    | /user/profile         |
-| PUT    | /user/profile_update  |
-| PUT    | /user/change-password |
+| Method | Endpoint                | Description                            |
+| ------ | ----------------------- | -------------------------------------- |
+| POST   | `/user/register`        | Register a new user                    |
+| POST   | `/user/login`           | Authenticate user and return JWT token |
+| GET    | `/user/profile`         | Get authenticated user's profile       |
+| PUT    | `/user/profile_update`  | Update authenticated user's profile    |
+| PUT    | `/user/change-password` | Change authenticated user's password   |
 
 ---
 
 ## Task Endpoints
 
-| Method | Endpoint                   |
-| ------ | -------------------------- |
-| POST   | /tasks                     |
-| GET    | /tasks                     |
-| GET    | /tasks/search-task         |
-| GET    | /tasks/due-tomorrow        |
-| GET    | /tasks/overdue             |
-| GET    | /tasks/priority/{priority} |
-| GET    | /tasks/status/{status}     |
-| GET    | /tasks/{task_id}           |
-| PUT    | /tasks/update/{task_id}    |
-| DELETE | /tasks/delete/{task_id}    |
+| Method | Endpoint                     | Description                          |
+| ------ | ---------------------------- | ------------------------------------ |
+| POST   | `/tasks`                     | Create a new task                    |
+| GET    | `/tasks`                     | Get paginated list of tasks          |
+| GET    | `/tasks/search-task`         | Search tasks by title or description |
+| GET    | `/tasks/due-tomorrow`        | Get tasks due tomorrow               |
+| GET    | `/tasks/overdue`             | Get overdue tasks                    |
+| GET    | `/tasks/priority/{priority}` | Filter tasks by priority             |
+| GET    | `/tasks/status/{status}`     | Filter tasks by status               |
+| GET    | `/tasks/{task_id}`           | Get a single task                    |
+| PUT    | `/tasks/update/{task_id}`    | Update a task                        |
+| DELETE | `/tasks/delete/{task_id}`    | Delete a task                        |
 
 ---
 
 ## Health Check
 
-| Method | Endpoint |
-| ------ | -------- |
-| GET    | /health  |
+| Method | Endpoint  | Description             |
+| ------ | --------- | ----------------------- |
+| GET    | `/health` | Check if API is running |
 
 ---
 
 ## Authentication
 
-The API uses JWT Bearer Authentication.
+The API uses **JWT Bearer Authentication**.
 
-After login, include the access token in the Authorization header:
+After login, include the access token in the `Authorization` header:
 
 ```http
 Authorization: Bearer <your_access_token>
@@ -327,7 +354,7 @@ Reminder emails are sent only once per task using the `reminder_sent` flag.
 
 ## Deployment
 
-The application is deployed on Render using Docker and PostgreSQL.
+The application is deployed on **Render** using **Docker** and **PostgreSQL**.
 
 ### Deployment Stack
 
@@ -341,20 +368,19 @@ The application is deployed on Render using Docker and PostgreSQL.
 
 Email notifications are implemented using FastAPI-Mail and Gmail SMTP.
 
-Email functionality works correctly in local environments. Cloud deployment may require an email provider such as Resend, SendGrid, or Mailgun due to SMTP restrictions imposed by some hosting providers.
+Email functionality works correctly in local environments. Cloud deployment may require an email provider such as **Resend**, **SendGrid**, or **Mailgun** due to SMTP restrictions imposed by some hosting providers.
 
 ---
 
 ## Future Improvements
 
 * Role-Based Access Control (RBAC)
-* Automated Unit Testing
-* Integration Testing
-* GitHub Actions CI/CD Pipeline
+* Integration Testing for more complete API coverage
 * Redis Caching
 * Production Email Service Integration (Resend/SendGrid)
 * API Rate Limiting
 * WebSocket Notifications
+* Admin Dashboard / Analytics Layer
 
 ---
 
@@ -373,6 +399,8 @@ Through this project I gained hands-on experience with:
 * Email Integration
 * Environment Variable Management
 * API Documentation
+* Automated Testing
+* Continuous Integration with GitHub Actions
 * Software Project Structure
 
 ---
@@ -380,4 +408,5 @@ Through this project I gained hands-on experience with:
 ## Author
 
 **Fardeen Chawhan**
+
 
