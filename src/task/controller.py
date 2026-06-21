@@ -49,7 +49,7 @@ def search_tasks(user:Usermodel,query:str,db:Session):
     return tasks
 
 
-def get_status(status:int,db:Session,user:Usermodel):
+def get_status(status:str,db:Session,user:Usermodel):
    tasks=(
         db.query(Taskmodel)
         .filter(Taskmodel.user_id==user.id)
@@ -62,7 +62,7 @@ def get_status(status:int,db:Session,user:Usermodel):
    return tasks
 
 
-def get_priority(priority:int,db:Session,user:Usermodel):
+def get_priority(priority:str,db:Session,user:Usermodel):
    tasks=(
         db.query(Taskmodel)
         .filter(Taskmodel.user_id==user.id)
@@ -77,7 +77,7 @@ def get_priority(priority:int,db:Session,user:Usermodel):
 
 def get_one_task(task_id:int, db:Session,user:Usermodel):
     
-    one_task=db.query(Taskmodel).get(task_id)
+    one_task = db.get(Taskmodel, task_id)
     if not one_task:
       raise HTTPException(status_code=404, detail="Task not found")
     
@@ -85,21 +85,24 @@ def get_one_task(task_id:int, db:Session,user:Usermodel):
       raise HTTPException(status_code=401, detail="You don't have access to this task")
     return one_task
 
-def update_task(body:TaskUpdateSchema,db:Session,task_id:int,user:Usermodel):
-    one_task=db.query(Taskmodel).get(task_id)
-    old_due_date=one_task.due_date
+def update_task(body: TaskUpdateSchema, db: Session, task_id: int, user: Usermodel):
+    one_task = db.get(Taskmodel, task_id)
+
     if not one_task:
-      raise HTTPException(status_code=404, detail="Task not found")
-    
+        raise HTTPException(status_code=404, detail="Task not found")
+
     if one_task.user_id != user.id:
-      raise HTTPException(status_code=401, detail="You cannot update this task")
-    
-    new_body=body.model_dump(exclude_unset=True)
+        raise HTTPException(status_code=401, detail="You cannot update this task")
+
+    old_due_date = one_task.due_date
+
+    new_body = body.model_dump(exclude_unset=True)
     for field, value in new_body.items():
-       setattr(one_task,field,value)
+        setattr(one_task, field, value)
 
     if one_task.due_date != old_due_date:
-       one_task.reminder_sent = False
+        one_task.reminder_sent = False
+
     db.add(one_task)
     db.commit()
     db.refresh(one_task)
@@ -108,7 +111,7 @@ def update_task(body:TaskUpdateSchema,db:Session,task_id:int,user:Usermodel):
 
 
 def delete_task(task_id:int,db:Session,user:Usermodel):
-    one_task=db.query(Taskmodel).get(task_id)
+    one_task = db.get(Taskmodel, task_id)
     if not one_task:
       raise HTTPException(status_code=404, detail="Task not found")
     if one_task.user_id != user.id:

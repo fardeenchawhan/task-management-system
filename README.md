@@ -352,6 +352,26 @@ Reminder emails are sent only once per task using the `reminder_sent` flag.
 
 ---
 
+## Testing
+
+This project includes automated tests for authentication and task management endpoints using pytest and FastAPI TestClient.
+
+Current test coverage includes:
+- User registration
+- User login
+- Task creation
+- Fetching all tasks
+- Search tasks
+- Filter tasks by status
+- Filter tasks by priority
+- Get single task
+- Update task
+- Delete task
+- Due tomorrow tasks
+- Overdue tasks
+
+Tests run automatically on every push and pull request through GitHub Actions.
+
 ## Deployment
 
 The application is deployed on **Render** using **Docker** and **PostgreSQL**.

@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# add project root to path
+# Add project root to Python path so imports work during testing
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from main import app
@@ -15,6 +15,7 @@ from src.user.models import Usermodel
 from src.utils.helpers import is_authenticated
 
 
+# Separate SQLite database only for testing
 TEST_DB_URL = "sqlite:///./test.db"
 
 engine = create_engine(
@@ -22,9 +23,14 @@ engine = create_engine(
     connect_args={"check_same_thread": False}
 )
 
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
 
 
+# Override the real DB dependency with the test DB
 def override_get_db():
     db = TestingSessionLocal()
     try:
@@ -33,6 +39,7 @@ def override_get_db():
         db.close()
 
 
+# Create test tables before tests start, drop them after tests finish
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
     Base.metadata.create_all(bind=engine)
@@ -41,6 +48,7 @@ def setup_database():
     engine.dispose()
 
 
+# Client fixture for unauthenticated routes like register/login
 @pytest.fixture
 def client():
     app.dependency_overrides[get_db] = override_get_db
@@ -49,14 +57,12 @@ def client():
     app.dependency_overrides.clear()
 
 
+# Client fixture for authenticated routes like /tasks
 @pytest.fixture
 def auth_client():
-    """
-    Test client with an authenticated fake user.
-    """
     db = TestingSessionLocal()
 
-    # create a fake user in test DB
+    # Create a fake authenticated user in test DB if not already present
     test_user = db.query(Usermodel).filter(Usermodel.username == "taskuser").first()
     if not test_user:
         test_user = Usermodel(
@@ -69,6 +75,7 @@ def auth_client():
         db.commit()
         db.refresh(test_user)
 
+    # Override authentication dependency
     def override_is_authenticated():
         return test_user
 
